@@ -55,12 +55,12 @@ int principal(char *arquivo_entrada, char *diretorio){
     float alphas[5] = {0.05, 0.10, 0.15, 0.30, 0.50};
     //printf("      Opcao escolhida: ALGORITMO GULOSO RANDOMIZADO\n");
     for (int i=0;i<5;i++){
-        Resultado *r2 = iteracoes_construtivo_adaptativo(&grafo,p,100,alphas[i]);
+        Resultado *r2 = iteracoes_construtivo_adaptativo(&grafo,p,1000,alphas[i]);
         imprimir_r(*r2,2,alphas[i]);
     }
    
     //printf("      Opcao escolhida: ALGORITMO GULOSO RANDOMIZADO REATIVO\n");
-    Resultado *r3 = iteracoes_construtivo_adaptativo_reativo(&grafo,p,500,100,alphas);
+    Resultado *r3 = iteracoes_construtivo_adaptativo_reativo(&grafo,p,2500,100,alphas);
     imprimir_r(*r3,3,0);
     destruir_grafo(&grafo);
     return 0;

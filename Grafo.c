@@ -1274,6 +1274,18 @@ Grafo caminhamento_Profundidade(Grafo *grafo, unsigned int o){
     return resposta;
 }
 
+
+// =============================================================================================================================================================================
+//                                                                        ALGORITMOS GULOSOS
+// =============================================================================================================================================================================
+
+/* ================================================
+*           COPIA GRAFO
+*-----------------------------------------------
+* Função: Copia um grafo
+* Parametros: grafo - grafo a ser copiado
+* Retorno: Grafo - cópia do grafo
+================================================ */
 Grafo* copia_grafo(Grafo grafo){
     Grafo* novo = (Grafo *)malloc(sizeof(Grafo));
     
@@ -1304,7 +1316,14 @@ Grafo* copia_grafo(Grafo grafo){
     return novo;
 }
 
-
+/*======================================================
+*             INICIALIZAR GRAFO MGGPP
+*---------------------------------------------------------
+* Função: Inicializa um grafo a partir de um arquivo
+* Parametros: grafo - ponteiro para o grafo a ser inicializado
+*             file - ponteiro para o arquivo
+* Retorno: int - valor de p
+======================================================*/
 int inicializar_grafo_MGGPP(Grafo *grafo, FILE *file) {
     int p;
 
@@ -1376,6 +1395,17 @@ int inicializar_grafo_MGGPP(Grafo *grafo, FILE *file) {
     return p;
 
 }
+
+/* ======================================================
+*             CHUTE INICIAL MGGPP
+* ------------------------------------------------------
+* Função: Cria um chute inicial para o procedimento construtivo 
+* Parametros: divisao - ponteiro para a divisão
+*             fila - ponteiro para a fila
+*             grafo - ponteiro para o grafo
+*             p - número de subgrafos
+* Retorno: void
+====================================================== */
 void chute_inicial(Divisao *divisao, Fila* fila, Grafo* grafo, int p){
 
     //Percorre todos o grafo para criar a lista de prioridades
@@ -1407,6 +1437,14 @@ void chute_inicial(Divisao *divisao, Fila* fila, Grafo* grafo, int p){
 
 }
 
+/*======================================================
+*             PROCEDIMENTO CONSTRUTIVO
+*---------------------------------------------------------
+* Função: Realiza o procedimento construtivo
+* Parametros: grafo - ponteiro para o grafo
+*             p - número de subgrafos
+* Retorno: Divisao - divisão do grafo
+======================================================*/
 Divisao* procedimento_construtivo(Grafo *grafo, int p){
 
     if (grafo == NULL || grafo->numero_de_nos <= 0) {
@@ -1522,6 +1560,15 @@ Divisao* procedimento_construtivo(Grafo *grafo, int p){
     return divisao;
 }
 
+/*======================================================
+*             PROCEDIMENTO CONSTRUTIVO ADAPTATIVO
+*---------------------------------------------------------
+* Função: Realiza o procedimento construtivo adaptativo
+* Parametros: grafo - ponteiro para o grafo
+*             p - número de subgrafos
+*             alpha - valor de alpha
+* Retorno: Divisao - divisão do grafo
+======================================================*/
 Divisao* procedimento_construtivo_adaptativo(Grafo *grafo, int p, float alpha){
 
     Divisao* divisao = NULL;
@@ -1596,6 +1643,15 @@ Divisao* procedimento_construtivo_adaptativo(Grafo *grafo, int p, float alpha){
     return divisao;
 }
 
+/*======================================================
+*             PROCEDIMENTO CONSTRUTIVO 
+*---------------------------------------------------------
+* Função: Realiza o procedimento construtivo 
+* Parametros: grafo - ponteiro para o grafo
+*             p - número de subgrafos
+*             interacoes - número de interações
+* Retorno: Resultado - resultado do procedimento
+======================================================*/
 Resultado* iteracoes_construtivo(Grafo *grafo, int p,int iteracoes){
     Resultado *global;
     global = (Resultado*)malloc(sizeof(Resultado));
@@ -1614,6 +1670,17 @@ Resultado* iteracoes_construtivo(Grafo *grafo, int p,int iteracoes){
     global->tempo_soma /=iteracoes;
     return global;
 }
+
+/*======================================================
+*             PROCEDIMENTO CONSTRUTIVO ADAPTATIVO
+*---------------------------------------------------------
+* Função: Realiza o procedimento construtivo adaptativo
+* Parametros: grafo - ponteiro para o grafo
+*             p - número de subgrafos
+*             iteracoes - número de interações
+*             alpha - valor de alpha
+* Retorno: Resultado - resultado do procedimento
+======================================================*/
 Resultado* iteracoes_construtivo_adaptativo(Grafo *grafo, int p,int iteracoes,float alpha){
     Resultado *global;
     global = (Resultado*)malloc(sizeof(Resultado));
@@ -1632,6 +1699,14 @@ Resultado* iteracoes_construtivo_adaptativo(Grafo *grafo, int p,int iteracoes,fl
     global->tempo_soma /=(iteracoes-global->falha);
     return global;
 }
+
+/*======================================================
+*           ESCOLHE ALPHA
+*---------------------------------------------------------
+* Função: Escolhe um valor de alpha
+* Parametros: probs - array de probabilidades
+* Retorno: int - valor de alpha
+======================================================*/
 int escolhe_alpha(float probs[5]){
     srand(time(NULL));
     float chute = ((float)(rand()%100) / 100 );
@@ -1645,6 +1720,17 @@ int escolhe_alpha(float probs[5]){
     return 4;
     
 }
+
+/*======================================================
+*           ATUALIZA PROBABILIDADES
+*---------------------------------------------------------
+* Função: Atualiza as probabilidades
+* Parametros: probs - array de probabilidades
+*             somas - array de somas
+*             freqs - array de frequências
+*             melhor_solucao - melhor solução
+* Retorno: void
+======================================================*/
 void atualiza_probabilidades(float probs[5],float somas[5],int freqs[5],float melhor_solucao){
     float q[5];
     float soma = 0;
@@ -1660,6 +1746,17 @@ void atualiza_probabilidades(float probs[5],float somas[5],int freqs[5],float me
     
 }
 
+/*======================================================
+*           PROCEDIMENTO CONSTRUTIVO ADAPTATIVO REATIVO
+*---------------------------------------------------------
+* Função: Realiza o procedimento construtivo adaptativo reativo
+* Parametros: grafo - ponteiro para o grafo
+*             p - número de subgrafos
+*             iteracoes - número de interações
+*             bloco - tamanho do bloco
+*             alphas - array de alphas
+* Retorno: Resultado - resultado do procedimento
+======================================================*/
 Resultado* iteracoes_construtivo_adaptativo_reativo(Grafo *grafo, int p,int iteracoes,int bloco, float *alphas){
     float probs[5] ={0.2, 0.2, 0.2, 0.2, 0.2};
     float somas[5] ={1,1,1,1,1};

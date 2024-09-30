@@ -4,7 +4,16 @@
 
 #include <time.h>
 
-
+/*======================================================
+*             COMPARA
+*---------------------------------------------------------
+* Função: Compara dois inteiros
+* Parametros: pri - primeiro inteiro
+*             seg - segundo inteiro
+*             criterio - critério de comparação
+*             igual - 1 se for para considerar igual, 0 caso contrário
+* Retorno: 1 se a comparação for verdadeira, 0 caso contrário
+======================================================*/
 int compara(int pri, int seg, char criterio, int igual){
     switch (criterio){
         case '>':
@@ -19,6 +28,15 @@ int compara(int pri, int seg, char criterio, int igual){
     }
 }
 
+/*======================================================
+*             INSERE
+*---------------------------------------------------------
+* Função: Insere um nó na lista
+* Parametros: l - ponteiro para a lista
+*             no - nó a ser inserido
+*             aresta - aresta que liga o nó a outro
+* Retorno: void
+======================================================*/
 void insere_l(Lista *l, No no, Aresta aresta){
     No_l *novo = (No_l*)malloc(sizeof(No_l));
     novo->origem = no.id;
@@ -47,6 +65,15 @@ void insere_l(Lista *l, No no, Aresta aresta){
         atual->proximo = novo;
     }
 }
+
+/*======================================================
+*             INSERE NO FINAL
+*---------------------------------------------------------
+* Função: Insere um nó no final da lista
+* Parametros: l - ponteiro para a lista
+*             novo - nó a ser inserido
+* Retorno: void
+======================================================*/
 void insere_no_final_l(Lista *l, No_l *novo){
     if (l->tam==0){
         novo->proximo = NULL;
@@ -62,6 +89,14 @@ void insere_no_final_l(Lista *l, No_l *novo){
 
 }
 
+/*======================================================
+*             RETORNA ELEMENTOS
+*---------------------------------------------------------
+* Função: Retorna os elementos de uma lista para outra
+* Parametros: l - ponteiro para a lista
+*             guardados - ponteiro para a lista que guardará os elementos
+* Retorno: void
+======================================================*/
 Lista* cria_l(Grafo grafo){
     Lista *nova = (Lista *)malloc(sizeof(Lista));
     nova->head = NULL;
@@ -78,6 +113,14 @@ Lista* cria_l(Grafo grafo){
     }
     return nova;
 }
+
+/*======================================================
+*             CRIA VAZIA
+*---------------------------------------------------------
+* Função: Cria uma lista vazia
+* Parametros: void
+* Retorno: Lista* - ponteiro para a lista
+======================================================*/
 Lista* cria_vazia_l(void){
     Lista *nova = (Lista *)malloc(sizeof(Lista));
     nova->head = NULL;
@@ -86,6 +129,14 @@ Lista* cria_vazia_l(void){
     
     return nova;
 }
+
+/*======================================================
+*             REMOVER 
+*---------------------------------------------------------
+* Função: Remove um nó da lista
+* Parametros: l - ponteiro para a lista
+* Retorno: No* - nó removido
+======================================================*/
 No_l* remover_l(Lista *l){
     if (l->tam==0){
         return NULL;
@@ -98,6 +149,14 @@ No_l* remover_l(Lista *l){
     }
     return removido;
 }
+
+/*======================================================
+*             VAZIA
+*---------------------------------------------------------
+* Função: Verifica se a lista está vazia
+* Parametros: l - lista
+* Retorno: int - 1 se a lista está vazia, 0 caso contrário
+======================================================*/
 No_l* remover_pos_l(Lista *l, int pos){
     if (l->tam==0){
         return NULL;
@@ -124,6 +183,14 @@ No_l* remover_pos_l(Lista *l, int pos){
     l->tam--;
     return removido;
 }
+
+/*======================================================
+*             MOSTRA LISTA
+*---------------------------------------------------------
+* Função: Mostra os elementos da lista
+* Parametros: l - lista
+* Retorno: void
+======================================================*/
 void mostra_l(Lista l){
     No_l *no = l.head;
     while (no!=NULL){
@@ -131,6 +198,14 @@ void mostra_l(Lista l){
         no = no->proximo;
     }
 }
+
+/*======================================================
+*             DESTROI LISTA
+*---------------------------------------------------------
+* Função: Destroi a lista
+* Parametros: l - ponteiro para a lista
+* Retorno: void
+======================================================*/
 void destroi_l(Lista *lista) {
     No_l *atual = lista->head;
     while (atual != NULL) {
@@ -140,6 +215,15 @@ void destroi_l(Lista *lista) {
     }
     free(lista); // Libera a lista em si
 }
+
+/*======================================================
+*             CRIA GAP
+*---------------------------------------------------------
+* Função: Cria um gap
+* Parametros: grafo - grafo
+*             criterio - critério de comparação
+* Retorno: Lista* - ponteiro para a lista
+======================================================*/
 Lista* cria_gap(Grafo grafo,char criterio){
     int nos[grafo.numero_de_nos];
     for (int i=0;i<grafo.numero_de_nos;i++){
@@ -175,6 +259,18 @@ Lista* cria_gap(Grafo grafo,char criterio){
     }
     return nova;
 }
+
+/*======================================================
+*             INSERE GAP
+*---------------------------------------------------------
+* Função: Insere um gap
+* Parametros: l - ponteiro para a lista
+*             origem - nó de origem
+*             destino - nó de destino
+*             gap - gap
+*             criterio - critério de comparação
+* Retorno: void
+======================================================*/
 void insere_gap(Lista *l, unsigned int origem, unsigned int destino, float gap, char criterio){
     No_l *novo = (No_l*)malloc(sizeof(No_l));
     novo->origem = origem;
@@ -215,6 +311,16 @@ void insere_gap(Lista *l, unsigned int origem, unsigned int destino, float gap, 
     }
 }
 
+/*======================================================
+*             REMOVER ARESTA
+*---------------------------------------------------------
+* Função: Remove uma aresta
+* Parametros: l - ponteiro para a lista
+*             origem - nó de origem
+*             destino - nó de destino
+*             criterio - critério de comparação
+* Retorno: void
+======================================================*/
 void remover_aresta_l(Lista *l, unsigned int origem, unsigned int destino, char criterio){
     if (l->tam==0){
         return;
@@ -242,6 +348,14 @@ void remover_aresta_l(Lista *l, unsigned int origem, unsigned int destino, char 
     }
 }
 
+/*======================================================
+*             REMOVER NÓ
+*---------------------------------------------------------
+* Função: Remove um nó
+* Parametros: l - ponteiro para a lista
+*             alvo - nó a ser removido
+* Retorno: void
+======================================================*/
 void remover_no_l(Lista *l, unsigned int alvo){
     if (l->tam==0){
         return;
@@ -266,6 +380,14 @@ void remover_no_l(Lista *l, unsigned int alvo){
         atual=atual->proximo;
     }
 }
+
+/*======================================================
+*             VAZIA
+*---------------------------------------------------------
+* Função: Verifica se a lista está vazia
+* Parametros: l - lista
+* Retorno: int - 1 se a lista está vazia, 0 caso contrário
+======================================================*/
 int vazia_l(Lista l){
     return l.tam==0;
 }
