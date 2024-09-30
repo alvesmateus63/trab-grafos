@@ -5,6 +5,15 @@
 #include <limits.h>
 #include <stdlib.h>
 
+/*======================================================
+*           CRIA DIVISÃO
+*---------------------------------------------------------
+* Função: Cria uma estrutura de divisão
+* Parametros: numero_de_nos - número de nós do grafo
+*             numero_subgrafos - número de subgrafos
+*             inicial - valor inicial para os subgrafos
+* Retorno: Divisao - estrutura de divisão
+======================================================*/
 Divisao* cria_d(int numero_de_nos, int numero_subgrafos, int inicial){
     //Nessa estrutura todas as posições dos vetores começam o armazenamento em 1,
     //para compatibilizar com o id dos nós.
@@ -32,6 +41,15 @@ Divisao* cria_d(int numero_de_nos, int numero_subgrafos, int inicial){
     return novo;
 }
 
+/*======================================================
+*           INSERE NÓ NA DIVISÃO
+*---------------------------------------------------------
+* Função: Insere um nó na divisão
+* Parametros: d - ponteiro para a divisão
+*             no - nó a ser inserido
+*             subgrafo - subgrafo ao qual o nó pertence
+* Retorno: void
+======================================================*/
 void insere_d(Divisao *d, No *no, int subgrafo){
     d->sub[no->id] = subgrafo;
     d->tam_sub[subgrafo]++;
@@ -43,10 +61,26 @@ void insere_d(Divisao *d, No *no, int subgrafo){
         d->min_sub[subgrafo] = no->peso;
     }
 }
+
+/*======================================================
+*           GAP LOCAL
+*---------------------------------------------------------
+* Função: Calcula o gap local de um subgrafo
+* Parametros: d - divisão
+*             subgrafo - subgrafo
+* Retorno: float - gap local
+======================================================*/
 float gap_local(Divisao d, int subgrafo){
     return d.max_sub[subgrafo] - d.min_sub[subgrafo];
 }
 
+/*======================================================
+*           GAP GLOBAL
+*---------------------------------------------------------
+* Função: Calcula o gap global da divisão
+* Parametros: d - divisão
+* Retorno: float - gap global
+======================================================*/
 float gap_global(Divisao d){
     float soma = 0;
     for(int i=1;i<=d.n_subs;i++){
@@ -55,6 +89,15 @@ float gap_global(Divisao d){
     return soma;
 }
 
+/*======================================================
+*           DIFERENÇA NO GAP
+*---------------------------------------------------------
+* Função: Calcula a diferença no gap de um nó
+* Parametros: d - divisão
+*             peso - peso do nó
+*             subgrafo - subgrafo ao qual o nó pertence
+* Retorno: float - diferença no gap
+======================================================*/
 float diferenca_no_gap(Divisao d, float peso, int subgrafo){
     if (peso > d.max_sub[subgrafo]){
         return peso - d.min_sub[subgrafo];
@@ -63,6 +106,14 @@ float diferenca_no_gap(Divisao d, float peso, int subgrafo){
     }
     return 0;
 }
+
+/*======================================================
+*           IMPRIMIR DIVISÃO
+*---------------------------------------------------------
+* Função: Imprime a divisão
+* Parametros: d - divisão
+* Retorno: void
+======================================================*/
 void imprimir_d(Divisao d){
     printf("Gap Global: %10.2f\n",gap_global(d));
     printf("Gaps Locais:\n");
@@ -70,6 +121,14 @@ void imprimir_d(Divisao d){
         printf("Subgrafo: %d - Tam: %3d - Min: %10.2f - Max: %10.2f - Gap: %10.2f\n",i, d.tam_sub[i], d.min_sub[i],d.max_sub[i],gap_local(d,i));
     }
 }
+
+/*======================================================
+*           DESTRUIR DIVISÃO
+*---------------------------------------------------------
+* Função: Destroi a divisão
+* Parametros: d - ponteiro para a divisão
+* Retorno: void
+======================================================*/
 void destruir_d(Divisao *d){
     free(d->sub);
     free(d->max_sub);
@@ -78,6 +137,13 @@ void destruir_d(Divisao *d){
     d = NULL;
 }
 
+/*======================================================
+*           ENCONTRAR MENOR GAP
+*---------------------------------------------------------
+* Função: Encontra o menor gap
+* Parametros: d - ponteiro para a divisão
+* Retorno: int - menor gap
+======================================================*/
 int encontrar_menor_gap(Divisao *d){
     int menor_gap=0;
     
