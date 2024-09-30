@@ -1,105 +1,17 @@
-#include "../include/Grafo.h"
-#include "../include/Defines.h"
-#include "../include/No.h"
-#include "../include/Fila.h"
-#include "../include/Pilha.h"
-#include "../include/Lista.h"
-#include "../include/Divisao.h"
-#include "../include/Resultado.h"
+#include "include/Grafo.h"
+#include "include/Defines.h"
+#include "include/No.h"
+#include "include/Fila.h"
+#include "include/Pilha.h"
+#include "include/Lista.h"
+#include "include/Divisao.h"
+#include "include/Resultado.h"
 
 #include <limits.h>
 #include <stdio.h>
 #include <time.h>
 
-#define INF FLT_MAX
 
-
-/* =======================================================
-*           GERA ARQUIVO DOT
-*---------------------------------------------------------
-* Função: Gera um arquivo DOT a partir de um grafo
-* Recebe: grafo - ponteiro para o grafo
-*         nome_arquivo - nome do arquivo de saída
-* Retorno: void
-* ======================================================*/
-void gerar_arquivo_dot(Grafo *grafo, const char *nome_arquivo) {
-    FILE *arquivo = fopen(nome_arquivo, "w");
-    if (arquivo == NULL) {
-        perror("Erro ao abrir arquivo");
-        return;
-    }
-    
-    // Verifica se o grafo é direcionado
-    if (grafo->direcionado) {
-        fprintf(arquivo, "digraph G {\n");
-    } else {
-        fprintf(arquivo, "graph G {\n");
-    }
-    
-    No *no_atual = grafo->primeiro;
-    
-    // Imprime os nós
-    while (no_atual != NULL) {
-        Aresta *aresta_atual = no_atual->primeira_aresta;
-        while (aresta_atual != NULL) {
-            if (grafo->direcionado) {
-                // Para grafos direcionados, use "->"
-                fprintf(arquivo, "  %d -> %d [label=\"%.2f\"];\n",
-                        no_atual->id, aresta_atual->id_alvo, aresta_atual->peso);
-            } else {
-                // Para grafos não direcionados, garantir que uma aresta não seja duplicada
-                if (no_atual->id < aresta_atual->id_alvo) {
-                    fprintf(arquivo, "  %d -- %d [label=\"%.2f\"];\n",
-                            no_atual->id, aresta_atual->id_alvo, aresta_atual->peso);
-                }
-            }
-            aresta_atual = aresta_atual->prox_aresta;
-        }
-        no_atual = no_atual->proximo_no;
-    }
-    
-    fprintf(arquivo, "}\n");
-    fclose(arquivo);
-}
-
-
-/* =======================================================
-*           GERA ARQUIVO DOT ARVORE DFS
-*---------------------------------------------------------
-* Função: Gera um arquivo DOT a partir de uma árvore DFS
-* Recebe: arvore_dfs - vetor de arestas da árvore DFS
-*         num_arestas_arvore - número de arestas da árvore DFS
-*         arestas_retorno - vetor de arestas de retorno
-*         num_arestas_retorno - número de arestas de retorno
-*         nome_arquivo - nome do arquivo de saída
-* Retorno: void
-* ======================================================*/
-void gerar_arquivo_dot_arvore_dfs(int *arvore_dfs, int num_arestas_arvore, int *arestas_retorno, int num_arestas_retorno, const char *nome_arquivo) {
-    FILE *arquivo = fopen(nome_arquivo, "w");
-    if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo %s para escrita\n", nome_arquivo);
-        return;
-    }
-
-    fprintf(arquivo, "digraph G {\n");
-    fprintf(arquivo, "    node [shape=circle];\n");
-
-    // Imprime as arestas da árvore DFS
-    fprintf(arquivo, "    // Arestas da Arvore DFS\n");
-    for (int i = 0; i < num_arestas_arvore; i++) {
-        fprintf(arquivo, "    %d -> %d;\n", arvore_dfs[i*2], arvore_dfs[i*2+1]);
-    }
-
-    // Imprime as arestas de retorno
-    fprintf(arquivo, "\n    // Arestas de retorno\n");
-    for (int i = 0; i < num_arestas_retorno; i++) {
-        fprintf(arquivo, "    %d -> %d [style=dotted];\n", arestas_retorno[i*2], arestas_retorno[i*2+1]);
-    }
-
-    fprintf(arquivo, "}\n");
-    fclose(arquivo);
-    printf("Arquivo DOT gerado com sucesso: %s\n", nome_arquivo);
-}
 
 // =============================================================================================================================================================================
 //                                                                            ESTRUTURA BÁSICA DE UM GRAFO
@@ -126,7 +38,7 @@ void inicializar_grafo_com_arquivo(Grafo *grafo, FILE *instance) {
         // Lê a primeira linha do arquivo de instância
         if (fgets(linha, 100, instance) != NULL) 
         {
-            sscanf(linha, "%d", &(grafo->numero_de_nos));
+            sscanf(linha, "%zu", &(grafo->numero_de_nos));
         } else {
             printf("Erro ao LER o nº total de nos!\n");
             return;
@@ -325,7 +237,7 @@ void remover_aresta(Grafo *grafo, unsigned int  id_no_1, unsigned int  id_no_2) 
     // 1. Encontra o nó de origem
     No *no_origem = encontrar_no_por_id(grafo, id_no_1); 
     if (no_origem == NULL) {
-        printf("Erro: Nó de origem %zu não encontrado.\n", id_no_1);
+        printf("Erro: Nó de origem %u não encontrado.\n", id_no_1);
         return;
     }
 
@@ -339,7 +251,7 @@ void remover_aresta(Grafo *grafo, unsigned int  id_no_1, unsigned int  id_no_2) 
     }
 
     if (aresta_atual == NULL) {
-        printf("Erro: Aresta de %zu para %zu não encontrada.\n", id_no_1, id_no_2);
+        printf("Erro: Aresta de %u para %u não encontrada.\n", id_no_1, id_no_2);
         return;
     }
 
@@ -358,7 +270,7 @@ void remover_aresta(Grafo *grafo, unsigned int  id_no_1, unsigned int  id_no_2) 
         // Remover a aresta correspondente no nó de destino
         no_origem = encontrar_no_por_id(grafo, id_no_2);
         if (no_origem == NULL) {
-            printf("Erro: Nó de destino %zu não encontrado.\n", id_no_2);
+            printf("Erro: Nó de destino %u não encontrado.\n", id_no_2);
             return;
         }
 
@@ -371,7 +283,7 @@ void remover_aresta(Grafo *grafo, unsigned int  id_no_1, unsigned int  id_no_2) 
         }
 
         if (aresta_atual == NULL) {
-            printf("Erro: Aresta de %zu para %zu não encontrada.\n", id_no_2, id_no_1);
+            printf("Erro: Aresta de %u para %u não encontrada.\n", id_no_2, id_no_1);
             return;
         }
 
@@ -395,7 +307,7 @@ void remover_aresta(Grafo *grafo, unsigned int  id_no_1, unsigned int  id_no_2) 
 *         peso - peso do nó
 * Retorno: void
 * =======================================================*/
-void adicionar_no(Grafo grafo, unsigned int  id_no, float peso) // adicionar nó na ordem
+void adicionar_no(Grafo *grafo, unsigned int  id_no, float peso) //* adicionar nó na ordem
 {
     // Verifica se o nó já existe no grafo
     No *no_atual = grafo->primeiro;
@@ -426,7 +338,7 @@ void adicionar_no(Grafo grafo, unsigned int  id_no, float peso) // adicionar nó
     }
     else // grafo não vazio
     {
-        No novo_no = (No)malloc(sizeof(No)); // cria um novo nó
+        No *novo_no = (No*)malloc(sizeof(No)); // cria um novo nó
         novo_no->id = id_no; 
         novo_no->peso = peso;
         novo_no->proximo_no = NULL;
@@ -449,7 +361,7 @@ void adicionar_no(Grafo grafo, unsigned int  id_no, float peso) // adicionar nó
 * =======================================================*/
 void adicionar_aresta(Grafo *grafo, unsigned int id_no_1, unsigned int  id_no_2, float peso)
 {
-    Aresta nova_aresta = (Aresta)malloc(sizeof(Aresta)); // cria uma nova aresta
+    Aresta *nova_aresta = (Aresta*)malloc(sizeof(Aresta)); // cria uma nova aresta
     
     if (nova_aresta == NULL) 
     {
@@ -527,19 +439,9 @@ void adicionar_aresta(Grafo *grafo, unsigned int id_no_1, unsigned int  id_no_2,
     }
     no_origem->numero_de_arestas+=1;
 }
-
-/*======================================================
-*                  GRAFO VAZIO
-*---------------------------------------------------------
-* Função: Verifica se o grafo está vazio
-* Recebe: grafo - ponteiro para o grafo
-* Retorno: 1 se o grafo estiver vazio, 0 caso contrário
-* ======================================================*/
 int grafo_vazio(Grafo grafo){
     return  (grafo.primeiro == NULL);
 }
-
-
 /*=======================================================
 *                  IMPRIMIR GRAFO 
 * Função: imprime o grafo
@@ -810,9 +712,8 @@ void inicializa_graus(Grafo *grafo)
 * Retorno: void
 ======================================================*/
 int comparar(const void *a, const void *b) {
-    return ((int)a - (int)b);
+    return (*(int*)a - *(int*)b);
 }
-
 
 /*====================================================== 
 *               BUSCA EM PROFUNDIDADE
@@ -919,7 +820,6 @@ void busca_prof(Grafo *grafo) {
     free(visitados);  // Libera a memória do divisao de visitados após a busca
 }
 
-
 /*====================================================== 
 *        FECHO TRANSITIVO DIRETO
 ---------------------------------------------------------
@@ -928,12 +828,11 @@ void busca_prof(Grafo *grafo) {
 *             u - nó de origem
 * Retorno: void
 ======================================================*/
-Fecho fecho_transitivo_direto(Grafo *grafo, unsigned int u) {
-    Fecho fecho = {NULL, 0};
+int* fecho_transitivo_direto(Grafo *grafo, unsigned int u) {
     No *no = encontrar_no_por_id(grafo, u);
     if (no == NULL) {
         printf("O vertice %u nao existe no grafo\n", u);
-        return fecho;
+        return NULL;
     }
 
     int *visitados = (int *)calloc(grafo->numero_de_nos, sizeof(int));
@@ -944,11 +843,11 @@ Fecho fecho_transitivo_direto(Grafo *grafo, unsigned int u) {
         printf("Erro ao alocar memoria\n");
         free(visitados);
         free(vertices_visitados);
-        return fecho;
+        return NULL;
     }
 
     busca_prof_visit(grafo, u, visitados, vertices_visitados, &contador_visitados);
-
+    
     if (!grafo->direcionado) {
         for (unsigned int i = 1; i <= grafo->numero_de_nos; i++) { 
             if (i != u && encontrar_no_por_id(grafo, i) != NULL && !visitados[i]) {
@@ -959,15 +858,18 @@ Fecho fecho_transitivo_direto(Grafo *grafo, unsigned int u) {
 
     // Ordenar os vértices visitados
     qsort(vertices_visitados, contador_visitados, sizeof(int), comparar);
-
-    // Atualizar o fecho transitivo direto
-    fecho.vertices = vertices_visitados;
-    fecho.tamanho = contador_visitados;
+    
+    // Imprimir os vértices em ordem crescente
+    printf("Fecho Transitivo Direto a partir do V%u: ", u);
+    for (int i = 0; i < contador_visitados; i++) {
+        printf("%d ", vertices_visitados[i]);
+    }
+    printf("\n");
 
     free(visitados);
-    return fecho;
+    free(vertices_visitados);
+    return visitados;
 }
-
 
 /*====================================================== 
 *        FECHO TRANSITIVO INDIRETO
@@ -977,12 +879,11 @@ Fecho fecho_transitivo_direto(Grafo *grafo, unsigned int u) {
 *             u - nó de origem
 * Retorno: void
 ======================================================*/
-Fecho fecho_transitivo_indireto(Grafo *grafo, unsigned int u) {
-    Fecho fecho = {NULL, 0};
+void fecho_transitivo_indireto(Grafo *grafo, unsigned int u) {
     No *no = encontrar_no_por_id(grafo, u);
     if (no == NULL) {
         printf("O vertice %u nao existe no grafo\n", u);
-        return fecho;
+        return;
     }
 
     int *visitados = (int *)calloc(grafo->numero_de_nos, sizeof(int));
@@ -993,7 +894,7 @@ Fecho fecho_transitivo_indireto(Grafo *grafo, unsigned int u) {
         printf("Erro ao alocar memoria\n");
         free(visitados);
         free(vertices_visitados);
-        return fecho;
+        return;
     }
 
     busca_prof_visit_inversa(grafo, u, visitados, vertices_visitados, &contador_visitados);
@@ -1009,293 +910,206 @@ Fecho fecho_transitivo_indireto(Grafo *grafo, unsigned int u) {
     // Ordenar os vértices visitados
     qsort(vertices_visitados, contador_visitados, sizeof(int), comparar);
 
-    // Atualizar o fecho transitivo indireto
-    fecho.vertices = vertices_visitados;
-    fecho.tamanho = contador_visitados;
+    // Imprimir os vértices em ordem crescente
+    printf("Fecho Transitivo Indireto a partir do V%u: ", u);
+    for (int i = 0; i < contador_visitados; i++) {
+        printf("%d ", vertices_visitados[i]);
+    }
+    printf("\n");
 
     free(visitados);
-    return fecho;
+    free(vertices_visitados);
 }
 
-
-/*====================================================== 
-*           IMPRIMIR FECHOS TRANSITIVOS
----------------------------------------------------------
-* Função: imprime o fecho transitivo direto ou indireto de um nó
-* Parametros: grafo - ponteiro para o grafo
-*             u - nó de origem
-*             tipo_str - tipo de fecho (direto ou indireto)
-* Retorno: void
-======================================================*/
-void imprimir_fecho(Grafo *grafo, unsigned int u, const char *tipo_str) {
-    Fecho fecho;
-
-    // Verificar se o tipo de fecho é válido
-    if (strcmp(tipo_str, "Direto") == 0) {
-        fecho = fecho_transitivo_direto(grafo, u);
-    } else if (strcmp(tipo_str, "Indireto") == 0) {
-        fecho = fecho_transitivo_indireto(grafo, u);
-    } else {
-        printf("Tipo de fecho desconhecido\n");
-        return;
-    }
-
-    // Imprimir o fecho transitivo
-    if (fecho.vertices != NULL) {
-        printf("Fecho Transitivo %s a partir do V%u: ", tipo_str, u);
-        for (int i = 0; i < fecho.tamanho; i++) {
-            printf("%d ", fecho.vertices[i]);
-        }
-        printf("\n");
-        free(fecho.vertices);
-    } else {
-        printf("Nenhum vertice encontrado\n");
-    }
-}
-
-
-// =============================================================================================================================================================================
-//                                                                        ALGORITMOS GRAFO
-// =============================================================================================================================================================================
 
 /*======================================================
-*               CAMINHO MÍNIMO - DIJKSTRA
+*        ALGORITMO DO CAMINHO MÍNIMO DE DIJKSTRA
 ---------------------------------------------------------
-* Função: Encontra o caminho mínimo entre dois nós utilizando
-*         o algoritmo de Dijkstra
+* Função: Em um grafo ponderado com pesos positivos,
+*         calcula e imprime o caminho mínimo pelo algoritmo
+*         de Dijkstra
 * Parametros: grafo - ponteiro para o grafo
 *             o - Identificador do nó de origem
 *             d - Identificador do nó de destino
-* Retorno: grafo com o caminho mínimo
+* Retorno: void
 ======================================================*/
-Grafo caminho_Dijkstra(Grafo *grafo, unsigned int o, unsigned int d) {
+Grafo caminho_Dijkstra(Grafo *grafo, unsigned int o, unsigned int d ){
+    
     Grafo resposta;
     inicializar_grafo(&resposta);
     resposta.direcionado = grafo->direcionado;
     resposta.arestas_ponderadas = grafo->arestas_ponderadas;
     
-    // Procura os nós do caminho
-    No *no_atual = encontrar_no_por_id(grafo, d);
-    if (no_atual == NULL) {
-        printf("Identificador de destino nao encontrado no grafo\n");
+    //Procura os nós do caminho
+    No *no_atual = encontrar_no_por_id(grafo,d);
+    if (no_atual==NULL){
+        printf("Identificador de destino não encontrado no grafo.\n");
         return resposta;
     }
-    no_atual = encontrar_no_por_id(grafo, o);
-    if (no_atual == NULL) {
-        printf("Identificador de origem nao encontrado no grafo\n");
+    no_atual = encontrar_no_por_id(grafo,o);
+    if (no_atual==NULL){
+        printf("Identificador de origem não encontrado no grafo.\n");
         return resposta;
     }
-
-    // Verificações
-    if (o == d) {
-        printf("Origem e destino iguais\n");
+    //Verificações
+    if (o==d){
+        printf("Origem e destino iguais.\n");
         return resposta;
     }
     
-    // Cria os vetores de distância e de predecessor
-    float *distancia = (float *)malloc(grafo->numero_de_nos * sizeof(float));
-    int *predecessor = (int *)malloc(grafo->numero_de_nos * sizeof(int));
+    //Cria os divisaoes de distância e de predecessor
+    float *distancia = (float *)malloc(grafo->numero_de_nos*sizeof(float));
+    int *predecessor = (int *)malloc(grafo->numero_de_nos*sizeof(int));
     Fila *visitados = cria_f();
     
     // atribuindo à todos os elementos de distância um valor muito grande
-    for (unsigned int i = 0; i < grafo->numero_de_nos; i++) {
+    for (int i=0;i<grafo->numero_de_nos;i++){
         distancia[i] = INT_MAX;
-        predecessor[i] = -1;
+        predecessor[i]=-1;
     }
     
-    // INICIANDO O ALGORITMO DE DIJKSTRA
-    distancia[o - 1] = 0;
+    //iniciando o algoritmo
+    distancia[o-1]=0; //*
     No *prox_no;
-    
+
     do {
         Aresta *aresta = no_atual->primeira_aresta;
-        while (aresta != NULL) {
-            prox_no = encontrar_no_por_id(grafo, aresta->id_alvo);
-
-            // Enfila
-            if (!contem_f(*visitados, prox_no->id)) {
-                // getchar();
-                if ((distancia[no_atual->id - 1] + aresta->peso) < distancia[aresta->id_alvo - 1]) {
-                    distancia[aresta->id_alvo - 1] = distancia[no_atual->id - 1] + aresta->peso;
-                    insere_f(visitados, prox_no);
-                    predecessor[aresta->id_alvo - 1] = no_atual->id;
+        while (aresta!=NULL){
+            prox_no = encontrar_no_por_id(grafo,aresta->id_alvo);
+            //enfila
+            if (!contem_f(*visitados,prox_no->id)){
+                //getchar();
+                if ((distancia[no_atual->id-1]+aresta->peso)<distancia[aresta->id_alvo-1]){ //*
+                    distancia[aresta->id_alvo-1] = distancia[no_atual->id-1]+aresta->peso;  //*
+                    insere_f(visitados,prox_no);
+                    predecessor[aresta->id_alvo-1] = no_atual->id;
                 }
             }
             aresta = aresta->prox_aresta;
         }
         no_atual = remove_f(visitados);
-    } while (no_atual != NULL);
-    
-    // Deletando a fila visitados
+        if (no_atual!=NULL)
+            printf("No atual: %d\n",no_atual->id);
+        
+    }while (no_atual!=NULL); //fila vazia
+
+    //deletando a fila visitados
     destroi_f(visitados);
     
-    // Inserindo os nós na lista e ordenando
-    unsigned int caminho[grafo->numero_de_nos];
-    int tamanho_caminho = 0;
-    No *atual = encontrar_no_por_id(grafo, d);
-    
-    while (atual->id != o) {
-        caminho[tamanho_caminho++] = atual->id;
-        atual = encontrar_no_por_id(grafo, predecessor[atual->id - 1]);
-        if (atual == NULL) {
-            return resposta;
-        }
+    //inserindo os nós no grafo resposta
+    adicionar_no(&resposta,d,d);
+    //resposta.numero_de_nos++;
+    No* atual = encontrar_no_por_id(grafo,d);
+    No* prev = encontrar_no_por_id(grafo,predecessor[atual->id-1]);
+    if (prev==NULL){
+        return resposta;
     }
-    caminho[tamanho_caminho++] = o;
-    
-    // Ordenando o caminho
-    for (int i = 0; i < tamanho_caminho - 1; i++) {
-        for (int j = i + 1; j < tamanho_caminho; j++) {
-            if (caminho[i] > caminho[j]) {
-                unsigned int temp = caminho[i];
-                caminho[i] = caminho[j];
-                caminho[j] = temp;
-            }
-        }
+    while(atual->id!=o){
+        adicionar_no(&resposta,prev->id,prev->peso);
+        resposta.numero_de_nos++;
+        adicionar_aresta(&resposta,atual->id,prev->id,distancia[atual->id-1]-distancia[prev->id-1]);
+        atual = prev;
+        prev = encontrar_no_por_id(grafo,predecessor[atual->id-1]);
     }
-    
-    // Adicionando os nós e arestas ao grafo resposta
-    for (int i = 0; i < tamanho_caminho - 1; i++) {
-        No *no1 = encontrar_no_por_id(grafo, caminho[i]);
-        No *no2 = encontrar_no_por_id(grafo, caminho[i + 1]);
-        adicionar_no(&resposta, no1->id, no1->peso);
-        adicionar_aresta(&resposta, no1->id, no2->id, distancia[no2->id - 1] - distancia[no1->id - 1]);
-    }
-    adicionar_no(&resposta, d, distancia[d - 1]);
-    
     return resposta;
+
 }
 
 
-/*======================================================
-*                 CAMINHO MÍNIMO - FLOYD
----------------------------------------------------------
-* Função: Encontra o caminho mínimo entre dois nós utilizando
-*         o algoritmo de Floyd
-* Parametros: grafo - ponteiro para o grafo
-*             o - Identificador do nó de origem
-*             d - Identificador do nó de destino
-* Retorno: grafo com o caminho mínimo
-======================================================*/
-Grafo caminho_Floyd(Grafo *grafo, unsigned int o, unsigned int d ){
+Grafo caminho_Floyd_Warshall(Grafo *grafo, unsigned int o, unsigned int d ){
     Grafo resposta;
     inicializar_grafo(&resposta);
     resposta.direcionado = grafo->direcionado;
     resposta.arestas_ponderadas = grafo->arestas_ponderadas;
-
-    // Verificação dos nós de origem e destino
-    No *no_atual = encontrar_no_por_id(grafo, d);
-    if (no_atual == NULL) {
-        printf("Identificador de destino nao encontrado no grafo\n");
+    
+    //Procura os nós do caminho
+    No *no_atual = encontrar_no_por_id(grafo,d);
+    if (no_atual==NULL){
+        printf("Identificador de destino não encontrado no grafo.\n");
         return resposta;
     }
-    no_atual = encontrar_no_por_id(grafo, o);
-    if (no_atual == NULL) {
-        printf("Identificador de origem nao encontrado no grafo\n");
+    no_atual = encontrar_no_por_id(grafo,o);
+    if (no_atual==NULL){
+        printf("Identificador de origem não encontrado no grafo.\n");
         return resposta;
     }
-
-    // Verificações adicionais
-    if (o == d) {
-        printf("Origem e destino iguais\n");
+    //Verificações
+    if (o==d){
+        printf("Origem e destino iguais.\n");
         return resposta;
     }
-
-    // Montar a matriz de distâncias e predecessores
+    
+    //montar a matriz de distâncias distancia
     float distancia[grafo->numero_de_nos][grafo->numero_de_nos];
     int predecessor[grafo->numero_de_nos][grafo->numero_de_nos];
     
-    for (unsigned int lin = 0; lin < grafo->numero_de_nos; lin++) {
-        for (unsigned int col = 0; col < grafo->numero_de_nos; col++) {
-            if (lin == col) {
+    //Monta a matriz distancia com as distâncias iniciais com zero da diagonal principal e infinto no resto
+    for (int lin=0;lin<grafo->numero_de_nos;lin++)
+        for (int col=0;col<grafo->numero_de_nos;col++){
+            if (lin==col){
                 distancia[lin][col] = 0;
                 predecessor[lin][col] = lin;
-            } else {
+                
+            }else{
                 distancia[lin][col] = FLT_MAX;
                 predecessor[lin][col] = -1;
             }
         }
-    }
     
+    //Colocando as distâncias
     No *v_lin = grafo->primeiro;
     Aresta *v_col;
-    while (v_lin != NULL) {
+    while (v_lin!=NULL){
         v_col = v_lin->primeira_aresta;
-        while (v_col != NULL) {
-            distancia[v_lin->id - 1][v_col->id_alvo - 1] = v_col->peso;
-            predecessor[v_lin->id - 1][v_col->id_alvo - 1] = v_lin->id - 1;
+        while (v_col != NULL){
+            
+            distancia[v_lin->id-1][v_col->id_alvo-1] = v_col->peso;
+            predecessor[v_lin->id-1][v_col->id_alvo-1] = v_lin->id-1;
             v_col = v_col->prox_aresta;
         }
         v_lin = v_lin->proximo_no;
     }
     
-    // Algoritmo de Floyd
-    for (unsigned int k = 0; k < grafo->numero_de_nos; k++) {
-        for (unsigned int i = 0; i < grafo->numero_de_nos; i++) {
-            for (unsigned int j = 0; j < grafo->numero_de_nos; j++) {
-                if (distancia[i][j] > distancia[i][k] + distancia[k][j]) {
+    //Método
+    for (int k=0;k<grafo->numero_de_nos;k++){
+        for (int i=0; i<grafo->numero_de_nos; i++){
+            for (int j=0; j<grafo->numero_de_nos; j++){
+                if (distancia[i][j] > distancia[i][k] + distancia[k][j]){
                     distancia[i][j] = distancia[i][k] + distancia[k][j];
                     predecessor[i][j] = predecessor[k][j];
                 }
             }
         }
     }
-
-    // Reconstruir o caminho
-    if (predecessor[o - 1][d - 1] == -1) {
-        return resposta;
-    }
+    //Caminho:
+     if (predecessor[o-1][d-1] == -1){
+         return resposta;
+     }
     
-    // Adicionar o nó de origem
-    adicionar_no(&resposta, o, 0);
-    No *atual = encontrar_no_por_id(grafo, d);
-    
-    // Adicionar todos os nós e arestas do caminho
-    while (atual->id != o) {
-        No *prev = encontrar_no_por_id(grafo, predecessor[o - 1][atual->id - 1] + 1);
-        if (prev == NULL) {
-            printf("Erro ao encontrar no anterior\n");
-            return resposta;
-        }
-        adicionar_no(&resposta, prev->id, 0);
-        adicionar_aresta(&resposta, prev->id, atual->id, distancia[prev->id - 1][atual->id - 1]);
+    //inserindo os nós no grafo resposta
+    adicionar_no(&resposta,d,d);
+    No* atual = encontrar_no_por_id(grafo,d);
+    No* prev = encontrar_no_por_id(grafo,predecessor[o-1][d-1]+1);
+    while(atual->id!=o){
+        adicionar_no(&resposta,prev->id,prev->peso);
+        resposta.numero_de_nos++;
+        adicionar_aresta(&resposta,atual->id,prev->id,distancia[prev->id-1][atual->id-1]);
         atual = prev;
+        prev = encontrar_no_por_id(grafo,predecessor[o-1][atual->id-1]+1);
     }
-    
-    // Adicionar o nó de destino
-    adicionar_no(&resposta, d, 0);
-
     return resposta;
 }
 
-
-/*======================================================
-*              VERIFICA SE ESTA ENTRE
----------------------------------------------------------
-* Função: Verifica se um elemento está entre um vetor
-* Parametros: vetor - vetor de inteiros
-*             elemento - elemento a ser verificado
-* Retorno: 1 se o elemento está no vetor, 0 caso contrário
-======================================================*/
-int esta_entre(unsigned int* vetor, unsigned int elemento){
-     int tam = sizeof(vetor) / sizeof(int);
-    for( int i=0;i<tam;i++){
-        if (elemento==vetor[i])
+int esta_entre(int* divisao, unsigned int elemento){
+    int tam = sizeof(divisao) / sizeof(int);
+    for(int i=0;i<tam;i++){
+        if (elemento==divisao[i])
             return 1;
     }
     return 0;
 }
 
-/*======================================================
-*        ÁRVORE GERADORA MÍNIMA - KRUSKAL
----------------------------------------------------------
-* Função: Encontra a árvore geradora mínima de um grafo
-*         utilizando o algoritmo de Kruskal
-* Parametros: grafo - ponteiro para o grafo
-* Retorno: Grafo - árvore geradora mínima
-======================================================*/
 Grafo AGM_Kruskal(Grafo grafo){
-    int n_nos = grafo.numero_de_nos;
     //Como detectar se o grafo não é
     if (grafo.numero_de_nos<3){
         return grafo;
@@ -1305,7 +1119,7 @@ Grafo AGM_Kruskal(Grafo grafo){
     inicializar_grafo(&subs);
     //AGM é para grafos não orientados
     if (grafo.direcionado){
-        printf("\tFalha. Esse eh um algoritmo para grafos nao direcionados\n");
+        printf("\tFalha. Esse é um algoritmo para grafos não direcionados.\n");
 
         return subs;
     }
@@ -1322,12 +1136,11 @@ Grafo AGM_Kruskal(Grafo grafo){
         subs.numero_de_nos++;
         no = no->proximo_no;
     }
-    int contador = 0;
+    unsigned int contador = 0;
     No_l *aresta;
     Grafo fecho_o;
     Grafo fecho_d;
-
-    while ((contador<n_nos - 1) && (lista->tam>0)){
+    while ((contador<grafo.numero_de_nos - 1) && (lista->tam>0)){
         aresta = remover_l(lista);
         fecho_o = caminho_Dijkstra(&subs, aresta->origem,aresta->destino);
 
@@ -1337,23 +1150,17 @@ Grafo AGM_Kruskal(Grafo grafo){
             contador++;
         }
     }
-    if (contador<n_nos - 1){
+    if (contador<grafo.numero_de_nos - 1){
         destruir_grafo(&subs);
         inicializar_grafo(&subs);
-        printf("\tFalha! Esse eh um algoritmo para grafos conexos\n");
+        printf("\tFalha! Esse é um algoritmo para grafos conexos.\n");
     }
     return subs;
 }
 
 
-/*======================================================
-*        ÁRVORE GERADORA MÍNIMA - PRIM
----------------------------------------------------------
-* Função: Encontra a árvore geradora mínima de um grafo
-*         utilizando o algoritmo de Prim
-* Parametros: grafo - ponteiro para o grafo
-* Retorno: Grafo - árvore geradora mínima
-======================================================*/
+
+
 Grafo AGM_Prim(Grafo grafo){
     if (grafo.numero_de_nos<3){
         return grafo;
@@ -1410,220 +1217,21 @@ Grafo AGM_Prim(Grafo grafo){
     if (subs.numero_de_nos<grafo.numero_de_nos){
         destruir_grafo(&subs);
         inicializar_grafo(&subs);
-        printf("\tFalha! Esse eh um algoritmo para grafos conexos\n");
+        printf("\tFalha! Esse é um algoritmo para grafos conexos.\n");
     }
     return subs;
 }
 
-
-/*======================================================
-*              VERTICES DE ARTICULACAO
----------------------------------------------------------
-* Função: Encontra os vértices de articulação de um grafo
-* Parametros: grafo - ponteiro para o grafo
-*             no_atual - nó atual
-*             visitado - vetor de visitados
-*             disc - vetor de descobertas
-*             low - vetor de low
-*             pai - vetor de pais
-*             articulacao - vetor de articulações
-* Retorno: void
-======================================================*/
-void articulacoes_DFS(Grafo *grafo, No *no_atual, bool visitado[], int disc[], int low[], unsigned int pai[], bool articulacao[]) {
-    static int tempo = 0;
-    int filhos = 0;
-
-    visitado[no_atual->id] = true;
-    disc[no_atual->id] = low[no_atual->id] = ++tempo;
-
-    Aresta *aresta = no_atual->primeira_aresta;
-    while (aresta != NULL) {
-        No *v = encontrar_no_por_id(grafo, aresta->id_alvo);
-
-        if (!visitado[v->id]) {
-            filhos++;
-            pai[v->id] = no_atual->id;
-            articulacoes_DFS(grafo, v, visitado, disc, low, pai, articulacao);
-
-            low[no_atual->id] = (low[no_atual->id] < low[v->id]) ? low[no_atual->id] : low[v->id];
-
-            if (pai[no_atual->id] == UINT_MAX && filhos > 1) {
-                articulacao[no_atual->id] = true;
-            }
-            if (pai[no_atual->id] != UINT_MAX && low[v->id] >= disc[no_atual->id]) {
-                articulacao[no_atual->id] = true;
-            }
-        } else if (v->id != pai[no_atual->id]) {
-            low[no_atual->id] = (low[no_atual->id] < disc[v->id]) ? low[no_atual->id] : disc[v->id];
-        }
-
-        aresta = aresta->prox_aresta;
-    }
-}
-
-
-/*======================================================
-*              ENCONTRA NÓS DE ARTICULAÇÃO
----------------------------------------------------------
-* Função: Encontra os vértices de articulação de um grafo
-* Parametros: grafo - ponteiro para o grafo
-* Retorno: void
-======================================================*/
-void encontra_nos_articulacao(Grafo *grafo) {
-    bool visitado[grafo->numero_de_nos];
-    int disc[grafo->numero_de_nos];
-    int low[grafo->numero_de_nos];
-    unsigned int *pai = (unsigned int *)malloc(grafo->numero_de_nos * sizeof(unsigned int));
-    bool articulacao[grafo->numero_de_nos];
-
-    // inicializa os vetores
-    for (size_t i = 0; i < grafo->numero_de_nos; i++) {
-        visitado[i] = false;
-        articulacao[i] = false;
-        pai[i] = UINT_MAX; // Inicializa pai com um valor que indica ausência de pai
-    }
-
-    No *atual = grafo->primeiro;
-    while (atual != NULL) {
-        if (!visitado[atual->id]) {
-            articulacoes_DFS(grafo, atual, visitado, disc, low, pai, articulacao);
-        }
-        atual = atual->proximo_no;
-    }
-
-    printf("Vertices de articulacao: ");
-    for (size_t i = 0; i < grafo->numero_de_nos; i++) {
-        if (articulacao[i]) {
-            printf("%u ", i);
-        }
-    }
-    printf("\n");
-
-    free(pai); // Não se esqueça de liberar a memória alocada
-}
-
-
-/*======================================================
-*             PROPRIEDADES DO GRAFO
-*---------------------------------------------------------
-* Função: Calcula e exibe as propriedades de um grafo: raio,
-*         diâmetro, centro e periferia
-* Parametros: grafo - ponteiro para o grafo
-* Retorno: void
-======================================================*/
-void calcular_propriedades_grafo(Grafo *grafo) {
-    unsigned int n = grafo->numero_de_nos;
-
-    // inicializar as matrizes de dist e predecessor
-    float distancia[n][n];
-    int predecessor[n][n];
-
-    for (unsigned int i = 0; i < n; i++) {
-        for (unsigned int j = 0; j < n; j++) {
-            if (i == j) {
-                distancia[i][j] = 0;
-                predecessor[i][j] = i;
-            } else {
-                distancia[i][j] = INF;
-                predecessor[i][j] = -1;
-            }
-        }
-    }
-
-    No *v_lin = grafo->primeiro;
-    Aresta *v_col;
-
-    // preenche as matrizes de dist e predecessor
-    while (v_lin != NULL) {
-        v_col = v_lin->primeira_aresta;
-        while (v_col != NULL) {
-            distancia[v_lin->id - 1][v_col->id_alvo - 1] = v_col->peso;
-            predecessor[v_lin->id - 1][v_col->id_alvo - 1] = v_lin->id - 1;
-            v_col = v_col->prox_aresta;
-        }
-        v_lin = v_lin->proximo_no;
-    }
-
-    // algoritmo de Floyd
-    for (unsigned int k = 0; k < n; k++) {
-        for (unsigned int i = 0; i < n; i++) {
-            for (unsigned int j = 0; j < n; j++) {
-                // Se a distância de i a j for maior que a distância de i a k + k a j, atualiza
-                if (distancia[i][j] > distancia[i][k] + distancia[k][j]) {
-                    distancia[i][j] = distancia[i][k] + distancia[k][j];
-                    predecessor[i][j] = predecessor[k][j];
-                }
-            }
-        }
-    }
-
-    // inicializar variaveis para raio, diâmetro, excentricidade
-    float raio = INF;
-    float diametro = 0;
-    float excentricidade[n];
-
-    for (unsigned int i = 0; i < n; i++) {
-        excentricidade[i] = 0;
-        for (unsigned int j = 0; j < n; j++) {
-            // se a distância de i a j for menor que infinito, atualiza a excentricidade
-            if (distancia[i][j] < INF) {
-                if (excentricidade[i] < distancia[i][j]) {
-                    excentricidade[i] = distancia[i][j];
-                }
-            }
-        }
-        if (raio > excentricidade[i]) {
-            raio = excentricidade[i];
-        }
-        if (diametro < excentricidade[i]) {
-            diametro = excentricidade[i];
-        }
-    }
-
-    // exibe as propriedades do grafo
-    printf("\nRaio: %.2f\n", raio);
-    printf("Diametro: %.2f\n", diametro);
-
-    printf("Centro:");
-    for (unsigned int i = 0; i < n; i++) {
-        if (excentricidade[i] == raio) {
-            printf(" %u ", i + 1);
-        }
-    }
-
-    printf("\nPeriferia:");
-    for (unsigned int i = 0; i < n; i++) {
-        if (excentricidade[i] == diametro) {
-            printf(" %u ", i + 1);
-        }
-    }
-    printf("\n");
-}
-
-
-/*======================================================
-*              ADICIONA ARESTA DE RETORNO
-*---------------------------------------------------------
-* Função: Adiciona uma aresta de retorno em um grafo
-* Parametros: entrada - ponteiro para o grafo de entrada
-*             saida - ponteiro para o grafo de saída
-*             id - identificador da aresta
-* Retorno: void
-======================================================*/
 void adiciona_aresta_de_retorno(Grafo *entrada, Grafo *saida, unsigned int id){
     No* no_saida = saida->primeiro;
     No* no_entrada;
     Aresta* aresta;
     while (no_saida!=NULL){
         no_entrada = encontrar_no_por_id(entrada,no_saida->id);
-        if (no_entrada==NULL){
-            no_saida = no_saida->proximo_no;
-            continue; // para evitar algum erro caso a entrada não tenha o nó
-        }
         aresta = no_entrada->primeira_aresta;
         while (aresta!=NULL){
             if (aresta->id_alvo==id){
-                adicionar_aresta(saida,id,no_saida->id,-1); // -1 para indicar que é uma aresta de retorno
+                adicionar_aresta(saida,id,no_saida->id,-1);
                 return;
             }
             aresta = aresta->prox_aresta;
@@ -1631,17 +1239,6 @@ void adiciona_aresta_de_retorno(Grafo *entrada, Grafo *saida, unsigned int id){
         no_saida = no_saida->proximo_no;
     }
 }
-
-
-/*======================================================
-*              RECURSÃO DO ENCAMINHAMENTO
-*---------------------------------------------------------
-* Função: Realiza a recursão do encaminhamento
-* Parametros: entrada - ponteiro para o grafo de entrada
-*             saida - ponteiro para o grafo de saída
-*             no - nó atual
-* Retorno: void
-======================================================*/
 void recursao_do_encaminhamento(Grafo *entrada,Grafo *saida, No *no){
     no->visitado = 1;
     adicionar_no(saida, no->id, no->id);
@@ -1658,23 +1255,13 @@ void recursao_do_encaminhamento(Grafo *entrada,Grafo *saida, No *no){
         aresta = aresta->prox_aresta;
     }
 }
-
-
-/*======================================================
-*              CAMINHAMENTO EM PROFUNDIDADE
-*---------------------------------------------------------
-* Função: Realiza o caminhamento em profundidade
-* Parametros: grafo - ponteiro para o grafo
-*             o - nó de origem
-* Retorno: Grafo - grafo com o caminhamento em profundidade
-======================================================*/
 Grafo caminhamento_Profundidade(Grafo *grafo, unsigned int o){
-    No *tmp_iterator = grafo->primeiro; // iterador para percorrer os nós
+    No *tmp_iterator = grafo->primeiro; // Iterador para percorrer os nós
     while (tmp_iterator != NULL) {
-        tmp_iterator->visitado = 0; // inicializa todos os vertices como não visitados
+        tmp_iterator->visitado = 0; // Inicializa todos os vértices como não visitados
         tmp_iterator = tmp_iterator->proximo_no;
     }
-   
+    //Cria o grafo de resposta
     Grafo resposta;
     inicializar_grafo(&resposta);
 
@@ -1686,11 +1273,6 @@ Grafo caminhamento_Profundidade(Grafo *grafo, unsigned int o){
     recursao_do_encaminhamento(grafo, &resposta, origem);
     return resposta;
 }
-
-
-// =============================================================================================================================================================================
-//                                                                        ALGORITMOS GULOSOS
-// =============================================================================================================================================================================
 
 Grafo* copia_grafo(Grafo grafo){
     Grafo* novo = (Grafo *)malloc(sizeof(Grafo));
@@ -1721,6 +1303,7 @@ Grafo* copia_grafo(Grafo grafo){
 
     return novo;
 }
+
 
 int inicializar_grafo_MGGPP(Grafo *grafo, FILE *file) {
     int p;
@@ -1793,7 +1376,6 @@ int inicializar_grafo_MGGPP(Grafo *grafo, FILE *file) {
     return p;
 
 }
-
 void chute_inicial(Divisao *divisao, Fila* fila, Grafo* grafo, int p){
 
     //Percorre todos o grafo para criar a lista de prioridades
